@@ -1,16 +1,23 @@
-namespace ProjectManager.API.Models
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+
+namespace ProjectManager.API.Models;
+
+public class Project
 {
-    public class Project
-    {
-        public int Id { get; set; } // Chave primária
-        public string Name { get; set; }
-        public string Description { get; set; }
+    public int Id { get; set; }
 
-        // Relação: Um projeto pertence a um usuário
-        public int UserId { get; set; }
-        public User User { get; set; }
+    [Required]
+    public string Name { get; set; } = string.Empty;
 
-        // Um projeto tem várias tarefas
-        public List<TaskItem> Tasks { get; set; }
-    }
+    [Required]
+    public string Description { get; set; } = string.Empty;
+
+    public int UserId { get; set; }
+
+    [ForeignKey("UserId")]
+    public User? User { get; set; }  // <-- agora é anulável
+
+    public List<TaskItem>? Tasks { get; set; }  // <-- agora é anulável
 }
+

@@ -7,6 +7,8 @@ namespace ProjectManager.API.Models
         public string Email { get; set; }
 
         // Relação: Um usuário pode ter vários projetos
-        public List<Project> Projects { get; set; }
+       public List<Project>? Projects { get; set; }
+
+
     }
 }
