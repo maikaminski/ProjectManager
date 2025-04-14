@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace ProjectManager.API.Models;
 
@@ -16,8 +17,10 @@ public class Project
     public int UserId { get; set; }
 
     [ForeignKey("UserId")]
-    public User? User { get; set; }  // <-- agora é anulável
+    [JsonIgnore]
+    public User? User { get; set; }
 
-    public List<TaskItem>? Tasks { get; set; }  // <-- agora é anulável
+    [JsonIgnore]
+    public List<TaskItem>? Tasks { get; set; } = new();
 }
 
