@@ -1,77 +1,59 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ProjectManager.API.Data;
+using ProjectManager.API.DTOs;
 using ProjectManager.API.Models;
 
-namespace ProjectManager.API.Controllers
+namespace ProjectManager.API.Controllers;
+
+[ApiController]
+[Route("api/[controller]")]
+public class ProjectsController : ControllerBase
 {
-    [ApiController]
-    [Route("api/[controller]")]
-    public class ProjectsController : ControllerBase
+    private readonly AppDbContext _context;
+
+    public ProjectsController(AppDbContext context)
     {
-        private readonly AppDbContext _context;
+        _context = context;
+    }
 
-        public ProjectsController(AppDbContext context)
+    // GET: api/Projects
+    [HttpGet]
+    public async Task<ActionResult<IEnumerable<ProjectReadDTO>>> GetAll()
+    {
+        var projects = await _context.Projects
+            .Select(p => new ProjectReadDTO
+            {
+                Id = p.Id,
+                Name = p.Name,
+                Description = p.Description
+            })
+            .ToListAsync();
+
+        return Ok(projects);
+    }
+
+    // POST: api/Projects
+    [HttpPost]
+    public async Task<ActionResult<ProjectReadDTO>> Create(ProjectCreateDTO dto)
+    {
+        var project = new Project
         {
-            _context = context;
-        }
+            Name = dto.Name,
+            Description = dto.Description,
+            UserId = dto.UserId
+        };
 
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<Project>>> GetProjects()
+        _context.Projects.Add(project);
+        await _context.SaveChangesAsync();
+
+        var readDto = new ProjectReadDTO
         {
-            return await _context.Projects
-                .Include(p => p.User)
-                .Include(p => p.Tasks)
-                .ToListAsync();
-        }
+            Id = project.Id,
+            Name = project.Name,
+            Description = project.Description
+        };
 
-        [HttpGet("{id}")]
-        public async Task<ActionResult<Project>> GetProject(int id)
-        {
-            var project = await _context.Projects
-                .Include(p => p.User)
-                .Include(p => p.Tasks)
-                .FirstOrDefaultAsync(p => p.Id == id);
-
-            if (project == null)
-                return NotFound();
-
-            return project;
-        }
-
-        [HttpPost]
-        public async Task<ActionResult<Project>> CreateProject(Project project)
-        {
-            _context.Projects.Add(project);
-            await _context.SaveChangesAsync();
-
-            return CreatedAtAction(nameof(GetProject), new { id = project.Id }, project);
-        }
-
-        [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateProject(int id, Project project)
-        {
-            if (id != project.Id)
-                return BadRequest();
-
-            _context.Entry(project).State = EntityState.Modified;
-            await _context.SaveChangesAsync();
-
-            return NoContent();
-        }
-
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteProject(int id)
-        {
-            var project = await _context.Projects.FindAsync(id);
-
-            if (project == null)
-                return NotFound();
-
-            _context.Projects.Remove(project);
-            await _context.SaveChangesAsync();
-
-            return NoContent();
-        }
+        return CreatedAtAction(nameof(GetAll), new { id = readDto.Id }, readDto);
     }
 }
