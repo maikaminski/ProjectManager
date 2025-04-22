@@ -6,27 +6,28 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend", policy =>
     {
-        policy.WithOrigins("http://localhost:5173") // seu front
+        policy.WithOrigins("http://localhost:5173")
               .AllowAnyHeader()
               .AllowAnyMethod();
     });
 });
-
-// Recupera a string de conexão do appsettings.Development.json
+// Recover the conection string from appsettings.Development.json
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 
-// Registra o DbContext com MySQL
+// DbContext with MySQL
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
 
-// Adiciona suporte a controllers e Swagger
+// Add support to controllers and Swagger
+
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
-// Configura o pipeline HTTP
+// Config the pipeline HTTP
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -37,7 +38,7 @@ app.UseHttpsRedirection();
 
 app.UseCors("AllowFrontend");
 
-// Usa controllers definidos na aplicação
+// Use controllers defined in aplication
 app.MapControllers();
 
 app.Run();

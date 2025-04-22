@@ -12,7 +12,7 @@ export default function UsersPage() {
 
   return (
     <div className="p-4">
-      <h1 className="text-2xl font-bold mb-4">Usuários</h1>
+      <h1 className="text-3xl font-bold text-yellow-600">Usuários</h1>
       <ul className="space-y-2">
         {users.map(user => (
           <li key={user.id} className="p-3 bg-gray-100 rounded-md shadow-sm">
